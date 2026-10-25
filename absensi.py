@@ -6,9 +6,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def jalankan_absen_otomatis():
+def jalankan_absen_subuh():
     options = Options()
-    options.add_argument("--headless") # Jalankan di background (tanpa buka jendela browser fisik)
+    options.add_argument("--headless") # Wajib headless agar berjalan di cloud GitHub Actions
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
@@ -37,13 +37,13 @@ def jalankan_absen_otomatis():
         print("Mengakses halaman login SIMA...")
         driver.get("https://sima.uin-malang.ac.id/login")
 
+        # Mengisi Form Login
         print("Mengisi kredensial...")
         username_input = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "login-username"))
         )
         password_input = driver.find_element(By.ID, "login-password")
 
-        # Mengambil data dari environment variables GitHub Secrets (atau isi langsung jika dites lokal)
         username_input.send_keys(os.environ.get("NIM_SIMA", "240605110052"))
         password_input.send_keys(os.environ.get("PASS_SIMA", "9214546314"))
 
@@ -53,39 +53,39 @@ def jalankan_absen_otomatis():
         )
         login_button.click()
 
-        # Navigasi ke Halaman Absensi Musyrif (Contoh: Subuh / Sesuaikan link jadwal Anda)
-        print("Menuju halaman absensi target...")
+        # Navigasi ke Halaman Absensi Salat Subuh
+        print("Menuju halaman absensi Salat Subuh...")
         target_url = "https://sima.uin-malang.ac.id/kemahadan/presensi-pendamping/input/1?title=Salat+Jamaah+Subuh"
         
         time.sleep(3)
         driver.get(target_url)
 
         print("Memuat halaman presensi...")
-        time.sleep(5) # Beri waktu agar tabel dan tombol 'Absen Sekarang' muncul
+        time.sleep(6) # Waktu tunggu agar tabel termuat sempurna
 
-        # LANGKAH 1: Klik tombol "Absen Sekarang"
+        # 1. KLIK TOMBOL "Absen Sekarang" berdasarkan struktur Vuetify
         print("Mencari dan mengklik tombol Absen Sekarang...")
-        tombol_absen_sekarang = WebDriverWait(driver, 15).until(
-            EC.element_to_be_clickable((By.XPATH, "//*[contains(text(), 'Absen Sekarang')]"))
+        tombol_absen = WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, "//button[contains(., 'Absen Sekarang')]"))
         )
-        driver.execute_script("arguments[0].click();", tombol_absen_sekarang)
-        print("Tombol Absen Sekarang berhasil diklik. Menunggu deteksi GPS & peta...")
+        driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", tombol_absen)
+        time.sleep(1)
+        driver.execute_script("arguments[0].click();", tombol_absen)
+        print("Tombol Absen Sekarang berhasil diklik. Menunggu pop-up peta...")
 
-        # LANGKAH 2: Menunggu pop-up peta terbuka dan tombol "Simpan Presensi" aktif/bisa diklik
-        time.sleep(4) # Waktu jeda untuk pemuatan koordinat peta
-        print("Mencari tombol Simpan Presensi di dalam pop-up...")
-        
+        # 2. Menunggu pop-up peta / dialog konfirmasi GPS muncul
+        time.sleep(5) 
+
+        # 3. KLIK TOMBOL "Simpan Presensi" di dalam pop-up
+        print("Mencari dan mengklik tombol Simpan Presensi...")
         tombol_simpan = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Simpan Presensi')]"))
+            EC.presence_of_element_located((By.XPATH, "//button[contains(., 'Simpan Presensi')]"))
         )
-        
         driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", tombol_simpan)
         time.sleep(1)
-
-        # LANGKAH 3: Klik "Simpan Presensi"
         driver.execute_script("arguments[0].click();", tombol_simpan)
 
-        print("Alhamdulillah, presensi berhasil disimpan secara otomatis!")
+        print("Alhamdulillah, presensi Salat Subuh berhasil disimpan secara otomatis!")
         time.sleep(5)
 
     except Exception as e:
@@ -95,4 +95,4 @@ def jalankan_absen_otomatis():
         driver.quit()
 
 if __name__ == "__main__":
-    jalankan_absen_otomatis()
+    jalankan_absen_subuh()
