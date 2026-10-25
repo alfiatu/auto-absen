@@ -52,7 +52,7 @@ def jalankan_absen_otomatis():
         login_button.click()
 
         print("Menuju halaman absensi target...")
-        target_url = "https://sima.uin-malang.ac.id/kemahadan/presensi/input/3?title=Salat+Jamaah+Maghrib"
+        target_url = "https://sima.uin-malang.ac.id/kemahadan/presensi/input/2?title=Salat+Jamaah+Maghrib"
         
         time.sleep(3)
         driver.get(target_url)
