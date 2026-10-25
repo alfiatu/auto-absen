@@ -37,4 +37,4 @@ jobs:
           NIM_SIMA: ${{ secrets.NIM_SIMA }}
           PASS_SIMA: ${{ secrets.PASS_SIMA }}
         run: |
-          python absen-kedua.py
+          python absensi.py
