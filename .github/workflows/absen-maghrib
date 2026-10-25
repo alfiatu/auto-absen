@@ -1,0 +1,40 @@
+name: Auto Absen 2 File Sekaligus
+
+on:
+  schedule:
+    # Contoh jadwal pukul 18.03 WIB (11.03 UTC)
+    - cron: '3 11 * * *'
+  workflow_dispatch: # Tombol tes manual di GitHub Actions
+
+jobs:
+  jalankan-dua-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install selenium
+
+      # 1. Menjalankan file skrip pertama
+      - name: Jalankan Absen Pertama
+        env:
+          NIM_SIMA: ${{ secrets.NIM_SIMA }}
+          PASS_SIMA: ${{ secrets.PASS_SIMA }}
+        run: |
+          python absen-maghrib.py
+
+      # 2. Menjalankan file skrip kedua di waktu yang sama
+      - name: Jalankan Absen Kedua
+        env:
+          NIM_SIMA: ${{ secrets.NIM_SIMA }}
+          PASS_SIMA: ${{ secrets.PASS_SIMA }}
+        run: |
+          python absensi-maghrib.py
