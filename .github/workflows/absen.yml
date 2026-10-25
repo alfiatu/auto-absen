@@ -1,13 +1,13 @@
-name: Auto Absen SIMA
+name: Auto Absen Bersamaan
 
 on:
   schedule:
-    # Berjalan setiap hari pukul 04.00 WIB (21.00 UTC hari sebelumnya)
+    # Berjalan pada waktu yang sama (misal pukul 04.00 WIB)
     - cron: '0 21 * * *'
-  workflow_dispatch: # Tombol untuk menjalankan secara manual dari tab Actions
+  workflow_dispatch:
 
 jobs:
-  absen:
+  jalankan-semua-absen:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -23,9 +23,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install selenium
 
-      - name: Run Automation Script
+      # 1. Menjalankan skrip pertama
+      - name: Jalankan Absen Subuh
         env:
           NIM_SIMA: ${{ secrets.NIM_SIMA }}
           PASS_SIMA: ${{ secrets.PASS_SIMA }}
         run: |
           python absen-subuh.py
+
+      # 2. Menjalankan skrip kedua (jika ada link/kegiatan lain di waktu yang sama)
+      - name: Jalankan Absen Kegiatan Lain
+        env:
+          NIM_SIMA: ${{ secrets.NIM_SIMA }}
+          PASS_SIMA: ${{ secrets.PASS_SIMA }}
+        run: |
+          python absen-kedua.py
