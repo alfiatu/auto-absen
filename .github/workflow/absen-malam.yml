@@ -1,0 +1,31 @@
+name: Auto Absen Malam 22.00 WIB
+
+on:
+  schedule:
+    # Berjalan setiap hari pukul 22.00 WIB (15.00 UTC)
+    - cron: '0 15 * * *'
+  workflow_dispatch: # Tombol untuk menjalankan secara manual dari tab Actions
+
+jobs:
+  absen-malam:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install selenium
+
+      - name: Jalankan Skrip Absen
+        env:
+          NIM_SIMA: ${{ secrets.NIM_SIMA }}
+          PASS_SIMA: ${{ secrets.PASS_SIMA }}
+        run: |
+          python absen-malam.py
